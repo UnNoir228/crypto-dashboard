@@ -1,0 +1,1 @@
+- [CoinGecko browser access](coingecko-browser-access.md) — route public CoinGecko requests through the same-origin API service because direct preview requests hit CORS restrictions.

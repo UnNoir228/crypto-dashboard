@@ -1,0 +1,114 @@
+Создай React + TypeScript + Vite проект под названием "crypto-dashboard".
+
+СТЕК:
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts (графики)
+- Axios (HTTP-запросы)
+- API: CoinGecko (бесплатный, без ключа)
+
+СТРУКТУРА ПРОЕКТА:
+crypto-dashboard/
+├── src/
+│   ├── components/
+│   │   ├── Header.tsx
+│   │   ├── MetricCard.tsx
+│   │   ├── CoinTable.tsx
+│   │   ├── CoinRow.tsx
+│   │   ├── PriceChart.tsx
+│   │   └── Loader.tsx
+│   ├── api/
+│   │   └── coingecko.ts
+│   ├── types/
+│   │   └── coin.ts
+│   ├── utils/
+│   │   └── format.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── index.html
+├── package.json
+├── tsconfig.json
+├── tailwind.config.js
+├── postcss.config.js
+├── vite.config.ts
+└── README.md
+
+ФУНКЦИОНАЛ:
+1. При загрузке сайт запрашивает топ-10 криптовалют по капитализации с CoinGecko API.
+2. Показывает карточки с метриками: общая капитализация, объём за 24ч, доминация BTC.
+3. Показывает таблицу: название монеты, логотип, цена, изменение за 24ч, капитализация.
+4. При клике на монету открывается детальный экран с графиком цены за 7 дней (Recharts LineChart).
+5. Есть кнопка "Назад" для возврата к таблице.
+6. Тёмная тема (bg-gray-900, text-white).
+7. Адаптив: на мобильных таблица превращается в карточки.
+8. Loading state (спиннер) и error state (сообщение + кнопка "Повторить").
+
+API ЭНДПОИНТЫ:
+- Топ-10: https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1
+- График: https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=7
+
+ТИПЫ (src/types/coin.ts):
+interface Coin {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  market_cap: number;
+  total_volume: number;
+}
+interface ChartPoint {
+  timestamp: number;
+  price: number;
+}
+interface ApiError {
+  message: string;
+}
+
+API-КЛИЕНТ (src/api/coingecko.ts):
+- fetchTopCoins(): Promise<Coin[]>
+- fetchChartData(id: string): Promise<ChartPoint[]>
+- Обработка ошибок через try/catch, возврат понятных сообщений.
+- Таймаут 10 секунд через axios.
+
+УТИЛИТЫ (src/utils/format.ts):
+- formatPrice(n: number): string — форматирует цену с $ и разделителями.
+- formatPercent(n: number): string — форматирует процент с + или -.
+- formatMarketCap(n: number): string — сокращает до B/M/K.
+
+КОМПОНЕНТЫ:
+- Header.tsx: заголовок "Crypto Dashboard" + подзаголовок.
+- MetricCard.tsx: карточка с иконкой, названием и значением.
+- CoinTable.tsx: таблица с заголовками (Name, Price, 24h, Market Cap).
+- CoinRow.tsx: строка таблицы с кликом.
+- PriceChart.tsx: Recharts LineChart с осью X (даты) и Y (цена).
+- Loader.tsx: анимированный спиннер на весь экран.
+
+APP.TSX:
+- Состояния: coins, selectedCoin, chartData, loading, error.
+- useEffect для загрузки топ-10 при монтировании.
+- handleCoinClick(id) — загружает график и переключает экран.
+- handleBack() — возвращает к таблице.
+- handleRetry() — перезагружает данные.
+
+СТИЛИ (Tailwind):
+- Тёмная тема: bg-gray-900, text-white.
+- Зелёный для роста (#10b981), красный для падения (#ef4444).
+- Адаптив: grid-cols-1 на мобильных, grid-cols-3 на десктопе.
+- Tailwind настроить в tailwind.config.js и index.css.
+
+DEPLOY:
+- Проект должен быть готов к деплою на Vercel.
+- README.md с описанием, стеком, инструкцией запуска и скриншотами.
+
+ВЫПОЛНИ:
+1. Создай структуру папок.
+2. Установи зависимости: npm install axios recharts, npm install -D tailwindcss postcss autoprefixer, npx tailwindcss init -p.
+3. Настрой Tailwind.
+4. Напиши все файлы полностью, без заглушек.
+5. Убедись, что проект запускается без ошибок.
+6. Напиши README.md.
