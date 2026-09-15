@@ -6,6 +6,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import DashboardPage from '@/pages/dashboard';
 import CoinDetailPage from '@/pages/coin-detail';
+import WatchlistPage from '@/pages/watchlist';
+import { WatchlistProvider } from '@/hooks/use-watchlist';
 import {
   Route,
   Switch,
@@ -22,6 +24,7 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
           <Route path="/" component={DashboardPage} />
+          <Route path="/watchlist" component={WatchlistPage} />
           <Route path="/coin/:id" component={CoinDetailPage} />
         <Route component={NotFound} />
       </Switch>
@@ -38,9 +41,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
+        <WatchlistProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <Router />
+          </WouterRouter>
+        </WatchlistProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

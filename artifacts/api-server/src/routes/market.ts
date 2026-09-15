@@ -2,8 +2,18 @@ import { Router, type IRouter, type Request, type Response } from "express";
 
 const router: IRouter = Router();
 const COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3";
+const CACHE_TTL_MS = 30_000;
+const cache = new Map<string, { body: string; contentType: string; expiresAt: number }>();
 
 async function proxyCoinGecko(path: string, res: Response, req: Request) {
+  const cached = cache.get(path);
+  if (cached && cached.expiresAt > Date.now()) {
+    res.status(200);
+    res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
+    res.type(cached.contentType).send(cached.body);
+    return;
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
@@ -16,7 +26,11 @@ async function proxyCoinGecko(path: string, res: Response, req: Request) {
 
     res.status(response.status);
     res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
-    res.type(response.headers.get("content-type") ?? "application/json").send(body);
+    const contentType = response.headers.get("content-type") ?? "application/json";
+    if (response.ok) {
+      cache.set(path, { body, contentType, expiresAt: Date.now() + CACHE_TTL_MS });
+    }
+    res.type(contentType).send(body);
   } catch (error) {
     const isTimeout = error instanceof Error && error.name === "AbortError";
     req.log.warn({ err: error, path }, "CoinGecko proxy request failed");

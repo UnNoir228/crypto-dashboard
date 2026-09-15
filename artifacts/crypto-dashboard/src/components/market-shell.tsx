@@ -1,17 +1,19 @@
 import { Activity, BarChart3, CircleHelp, Menu, Radio, Search, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
+import { useWatchlist } from '@/hooks/use-watchlist';
 
 export function MarketShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { ids } = useWatchlist();
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[236px] flex-col border-r border-sidebar-border bg-sidebar lg:flex">
         <Brand />
         <nav className="flex-1 space-y-1 px-3 py-6" aria-label="Primary navigation">
           <NavItem href="/" icon={BarChart3} label="Market overview" active={location === '/'} />
-          <NavItem href="/" icon={Activity} label="Watchlist" active={false} />
+          <NavItem href="/watchlist" icon={Activity} label="Watchlist" active={location === '/watchlist'} count={ids.length} />
         </nav>
         <div className="m-4 rounded-xl border border-sidebar-border bg-sidebar-accent p-4">
           <div className="flex items-center gap-2 text-xs font-bold text-sidebar-foreground"><Radio size={13} className="text-primary" /> Live feed</div>
@@ -41,7 +43,7 @@ export function MarketShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden" onClick={() => setMenuOpen(false)}>
           <aside className="h-full w-[270px] bg-sidebar px-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between"><Brand /><button type="button" aria-label="Close navigation" data-testid="button-close-menu" onClick={() => setMenuOpen(false)} className="rounded-md p-2 text-muted-foreground hover:text-foreground"><X size={18} /></button></div>
-            <nav className="mt-5 space-y-1"><NavItem href="/" icon={BarChart3} label="Market overview" active={location === '/'} /></nav>
+            <nav className="mt-5 space-y-1"><NavItem href="/" icon={BarChart3} label="Market overview" active={location === '/'} /><NavItem href="/watchlist" icon={Activity} label="Watchlist" active={location === '/watchlist'} count={ids.length} /></nav>
           </aside>
         </div>
       )}
@@ -60,6 +62,6 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function NavItem({ href, icon: Icon, label, active }: { href: string; icon: typeof BarChart3; label: string; active: boolean }) {
-  return <Link href={href} data-testid={`link-nav-${label.toLowerCase().replace(/\s+/g, '-')}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${active ? 'bg-sidebar-accent text-sidebar-foreground' : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground'}`}><Icon size={17} className={active ? 'text-primary' : ''} />{label}{active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />}</Link>;
+function NavItem({ href, icon: Icon, label, active, count }: { href: string; icon: typeof BarChart3; label: string; active: boolean; count?: number }) {
+  return <Link href={href} data-testid={`link-nav-${label.toLowerCase().replace(/\s+/g, '-')}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${active ? 'bg-sidebar-accent text-sidebar-foreground' : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground'}`}><Icon size={17} className={active ? 'text-primary' : ''} />{label}{count ? <span className="ml-auto rounded-full bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-bold text-primary">{count}</span> : active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />}</Link>;
 }

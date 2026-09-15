@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getGlobalMarket, getMarketCoins, type Coin, type GlobalMarket, type MarketApiError } from '@/lib/market-api';
 
-export function useMarketData() {
+export function useMarketData({ enabled = true }: { enabled?: boolean } = {}) {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [globalMarket, setGlobalMarket] = useState<GlobalMarket | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,8 +24,12 @@ export function useMarketData() {
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(false);
+      return;
+    }
     void load();
-  }, [load]);
+  }, [enabled, load]);
 
   return { coins, globalMarket, isLoading, error, lastUpdated, refetch: load };
 }

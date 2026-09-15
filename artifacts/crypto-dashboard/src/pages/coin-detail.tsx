@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarDays, CircleDollarSign, ExternalLink, LineChart, RefreshCw, Volume2 } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CircleDollarSign, ExternalLink, LineChart, RefreshCw, Star, Volume2 } from 'lucide-react';
 import { Link, useParams } from 'wouter';
 import { CoinMark } from '@/components/coin-mark';
 import { MarketShell } from '@/components/market-shell';
@@ -7,6 +7,7 @@ import { PriceChart } from '@/components/price-chart';
 import { ChangeValue } from '@/components/metric-card';
 import { useCoinChart } from '@/hooks/use-coin-chart';
 import { useMarketData } from '@/hooks/use-market-data';
+import { useWatchlist } from '@/hooks/use-watchlist';
 
 const price = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 8 });
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 });
@@ -15,6 +16,7 @@ export default function CoinDetailPage() {
   const { id = '' } = useParams<{ id: string }>();
   const { coins, isLoading: isMarketLoading, error: marketError, refetch: refetchMarket } = useMarketData();
   const { points, isLoading: isChartLoading, error: chartError, refetch: refetchChart } = useCoinChart(id);
+  const { isSaved, toggle } = useWatchlist();
   const coin = coins.find((item) => item.id === id);
   const first = points[0]?.price;
   const last = points[points.length - 1]?.price;
@@ -34,7 +36,7 @@ export default function CoinDetailPage() {
               <section className="animate-rise-in flex flex-col justify-between gap-6 border-b border-border pb-8 sm:flex-row sm:items-end">
                 <div className="flex items-center gap-4">
                   <CoinMark image={coin.image} name={coin.name} symbol={coin.symbol} size="lg" />
-                  <div><div className="flex items-center gap-2"><h1 data-testid="text-detail-name" className="text-3xl font-extrabold tracking-[-0.04em] text-foreground">{coin.name}</h1><span className="rounded bg-muted px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{coin.symbol}</span></div><p className="mt-2 text-sm text-muted-foreground">7-day price movement</p></div>
+                  <div><div className="flex flex-wrap items-center gap-2"><h1 data-testid="text-detail-name" className="text-3xl font-extrabold tracking-[-0.04em] text-foreground">{coin.name}</h1><span className="rounded bg-muted px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{coin.symbol}</span><button type="button" aria-label={isSaved(coin.id) ? `Remove ${coin.name} from watchlist` : `Add ${coin.name} to watchlist`} aria-pressed={isSaved(coin.id)} onClick={() => toggle(coin.id)} data-testid="button-detail-watchlist" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><Star size={16} fill={isSaved(coin.id) ? 'currentColor' : 'none'} className={isSaved(coin.id) ? 'text-primary' : ''} /></button></div><p className="mt-2 text-sm text-muted-foreground">7-day price movement</p></div>
                 </div>
                 <div className="sm:text-right"><p data-testid="text-detail-price" className="font-mono text-2xl font-medium tracking-tight text-foreground">{price.format(coin.current_price)}</p><div className="mt-2 flex items-center gap-3 sm:justify-end"><ChangeValue value={coin.price_change_percentage_24h} /><span className="text-xs text-muted-foreground">24h</span></div></div>
               </section>
