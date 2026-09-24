@@ -16,9 +16,11 @@ const api = spawn(process.execPath, ['server/dist/index.mjs'], {
   env: environment,
   stdio: 'inherit',
 });
+
 const web = spawn(npmCommand, ['exec', '--', 'vite'], {
   env: process.env,
   stdio: 'inherit',
+  shell: true,
 });
 
 const stop = () => {
@@ -28,6 +30,7 @@ const stop = () => {
 
 process.on('SIGINT', stop);
 process.on('SIGTERM', stop);
+
 api.on('exit', (code) => {
   if (code && code !== 0) {
     web.kill('SIGTERM');
