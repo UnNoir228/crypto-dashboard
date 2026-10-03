@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 
 const router: IRouter = Router();
 const COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3";
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 300_000;
 const cache = new Map<string, { body: string; contentType: string; expiresAt: number }>();
 
 async function proxyCoinGecko(path: string, res: Response, req: Request) {
