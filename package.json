@@ -10,7 +10,7 @@
     "build": "npm run typecheck && npm run build:frontend && npm run build:server",
     "build:frontend": "vite build",
     "build:server": "node server/build.mjs",
-    "start": "node server/dist/index.mjs",
+    "start": "node scripts/dev.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
